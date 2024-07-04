@@ -24,13 +24,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.webproject</groupId>
-            <artifactId>repairSystemprotobuf</artifactId>
-            <version>0.0.1</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/repairSystemprotobuf-0.0.1.jar</systemPath>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
@@ -75,6 +68,23 @@
             <groupId>io.grpc</groupId>
             <artifactId>grpc-stub</artifactId>
             <version>1.59.0</version>
+        </dependency>
+
+        <!--custom library-->
+        <dependency>
+            <groupId>org.webproject</groupId>
+            <artifactId>repairSystemprotobuf</artifactId>
+            <version>0.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/repairSystemprotobuf-0.0.1.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.webproject</groupId>
+            <artifactId>responseWrapper</artifactId>
+            <version>0.0.1</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/responseWrapper-0.0.1.jar</systemPath>
         </dependency>
 
     </dependencies>
