@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.webproject.mainsystem.model.dto.request.CarFilterListRequestModel
+import org.webproject.mainsystem.model.dto.request.RequestStatusRequestModel
 import org.webproject.mainsystem.model.dto.request.SkillFilterListRequestModel
 import org.webproject.mainsystem.service.AdminService
 import org.webproject.responsewrapper.custom.response.ResponseHandler.generateResponse
@@ -28,11 +29,28 @@ class AdminController @Autowired constructor(val adminService: AdminService) {
         return generateResponse("Ok",200,null)
     }
 
-    @PostMapping("/filter/addCarType")
+    @PostMapping("/filter/addSkillType")
     fun addSkillFilter(@RequestBody requestModel: SkillFilterListRequestModel): ResponseEntity<Any?> {
         adminService.addSkillType(requestModel)
 
         return generateResponse("Ok",200,null)
+    }
+
+    @GetMapping("/getAllRequestList")
+    fun getAllRequestList(): ResponseEntity<Any?> {
+        return generateResponse("Ok",200,adminService.getAllRequestList())
+    }
+    //DONE TODO admin accept / rege requests
+
+    @PostMapping("/changeReqStatus")
+    fun changeStatus(@RequestBody requestModel: RequestStatusRequestModel) : ResponseEntity<Any?>{
+        adminService.changeRequestStatus(requestModel)
+        return generateResponse("Ok",200,null)
+    }
+
+    @GetMapping("/getAllReportList")
+    fun getAllReportList(): ResponseEntity<Any?> {
+        return generateResponse("Ok",200,adminService.getAllReportList())
     }
 
 }

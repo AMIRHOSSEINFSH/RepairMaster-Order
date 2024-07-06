@@ -11,12 +11,12 @@ import java.util.UUID;
 public class UserDao {
 
     @Id
-    protected UUID id;
+    public UUID id;
 
-    private String email;
+    public String email;
 
-    private String firstname;
+    public String firstname;
 
-    private String lastname;
+    public String lastname;
 
 }

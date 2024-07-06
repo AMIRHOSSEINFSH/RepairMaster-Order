@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -15,13 +15,13 @@ public class SupportedCarDao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private long id;
+    public long id;
 
     @Column(unique = true, nullable = false)
-    private String brand;
+    public String brand;
 
-    private String model;
+    public String model;
 
-    private String img_link;
+    public String img_link;
 
 }

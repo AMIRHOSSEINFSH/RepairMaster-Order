@@ -19,7 +19,7 @@ public enum WorkExperience {
         }
     }
 
-    WorkExperience getWorkExperienceTypeById(int id) {
+    public static WorkExperience getWorkExperienceTypeById(int id) {
         for(WorkExperience workExperience : WorkExperience.values()) {
             if(workExperience.id == id) {
                 return workExperience;

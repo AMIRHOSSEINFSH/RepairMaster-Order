@@ -2,15 +2,12 @@ package org.webproject.mainsystem.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.webproject.mainsystem.model.dao.requestDao.RequestDao
-import org.webproject.mainsystem.model.dto.request.CarFilterListRequestModel
-import org.webproject.mainsystem.model.dto.request.RequestRepairRequestModel
-import org.webproject.mainsystem.model.dto.request.SkillFilterListRequestModel
+import org.webproject.mainsystem.model.dao.ReportDao
+import org.webproject.mainsystem.model.dao.RequestDao
+import org.webproject.mainsystem.model.dto.request.*
+import org.webproject.mainsystem.model.dto.response.RequestListResponseModel
 import org.webproject.mainsystem.model.enumData.RequestStatus
-import org.webproject.mainsystem.repository.CustomerRepository
-import org.webproject.mainsystem.repository.RequestRepository
-import org.webproject.mainsystem.repository.SkillRepository
-import org.webproject.mainsystem.repository.SupportedCarRepository
+import org.webproject.mainsystem.repository.*
 import org.webproject.responsewrapper.custom.exception.DefaultSupportedException
 import org.webproject.responsewrapper.custom.exception.SupportedMissMatchException
 import java.time.LocalDateTime
@@ -22,7 +19,9 @@ class CustomerService @Autowired constructor(
     private val customerRepo: CustomerRepository,
     private val requestRepo: RequestRepository,
     private val carRepo: SupportedCarRepository,
-    private val skillRepo: SkillRepository
+    private val skillRepo: SkillRepository,
+    private val repairManRepo: RepairManRepository,
+    private val reportRepo: ReportRepository
 ) {
 
     fun addRepairRequest(customer: UUID, requestModel: RequestRepairRequestModel) {
@@ -36,11 +35,11 @@ class CustomerService @Autowired constructor(
 
         val carDb = carRepo.findById(requestModel.carId).orElseThrow { throw SupportedMissMatchException("Car Not Found",404) }
 
-        val requestDb = RequestDao.builder().apply {
-            this.requester(customerDb)
-            car(carDb)
-            description(requestModel.description)
-        }.build()
+        val requestDb = RequestDao().apply {
+            this.requester = customerDb
+            car = carDb
+            description = requestModel.description
+        }
         requestRepo.save(requestDb)
 
     }
@@ -64,6 +63,53 @@ class CustomerService @Autowired constructor(
                 }
             )
         }
+    }
+
+    fun getRequestList(userId: UUID): RequestListResponseModel {
+        val customerDb = customerRepo.findById(userId).orElseThrow { DefaultSupportedException("Your Token has problem in userId",403) }
+        return customerDb.requestList.map {itReq->
+            RequestListResponseModel.RequestItem(itReq.repairMan.id,itReq.car,itReq.description,itReq.status)
+        }.let {
+            RequestListResponseModel().apply { addAll(it) }
+        }
+    }
+
+    fun editProfile(userId: UUID,request: UserEditProfileRequestModel) {
+        if(request.firstName.isNullOrBlank() && request.lastName.isNullOrBlank()) throw DefaultSupportedException("You must fill at least firstname or lastname",405)
+
+        val userDb = customerRepo.findById(userId).orElseThrow { DefaultSupportedException("User id is not valid") }
+
+        when {
+            request.firstName.isNullOrBlank() && !request.lastName.isNullOrBlank() -> {
+                userDb.firstname = request.firstName
+            }
+            !request.firstName.isNullOrBlank() && request.lastName.isNullOrBlank() -> {
+                userDb.lastname = request.lastName
+            }
+            !request.firstName.isNullOrBlank() && !request.lastName.isNullOrBlank() -> {
+                userDb.firstname = request.firstName
+                userDb.lastname = request.lastName
+            }
+        }
+
+        //TODO do a grpc for sync between sso and mainSystem
+
+        customerRepo.save(userDb)
+    }
+
+    fun reportRepairMan(userId: UUID,request: ReportRequestModel) {
+        val reporter = customerRepo.findById(userId).orElseThrow { DefaultSupportedException("Your id is not valid!",403) }
+
+        val repairman =repairManRepo.findById(request.repairManId).orElseThrow { DefaultSupportedException("Your id is not valid!",403) }
+
+        ReportDao().apply {
+            setRepairMan(repairman)
+            setReporter(reporter)
+            setDescription(request.description)
+        }.let { itReport->
+            reportRepo.save(itReport)
+        }
+
     }
 
 }
